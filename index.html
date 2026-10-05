@@ -9,7 +9,7 @@
 *,*::before,*::after{box-sizing:border-box}
 
 :root{
-  --quadra:#1553A1; --quadra-faixa:#124A92; --painel:#0B1E3A;
+  --quadra:#164C93; --quadra-faixa:#134385; --painel:#0B1E3A;
   --camisa:#F26A1F; --na-camisa:#0B1E3A; --cartao:#F4C20D;
   --fundo:#EDF1F6; --papel:#FFFFFF; --tinta:#10233D; --tinta-2:#55667E;
   --risca:#D3DBE6; --erro:#B42318; --destaque:#FFE9D9;
@@ -33,18 +33,21 @@
 
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{
-  margin:0; background:var(--quadra); color:var(--tinta);
+  margin:0; background:#0B2548; color:var(--tinta);
   font:400 16px/1.45 var(--texto); -webkit-text-size-adjust:100%;
 }
 button,input{font:inherit; color:inherit}
+[hidden]{display:none!important}
 :focus-visible{outline:3px solid var(--camisa); outline-offset:2px}
 
-/* ---------- Fundo: a quadra vista de cima ---------- */
+/* ---------- Fundo: a quadra vista de cima, com a luz baixa ---------- */
 .quadra-fundo{
   position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
-  background:repeating-linear-gradient(180deg,var(--quadra) 0 72px,var(--quadra-faixa) 72px 144px);
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(4,12,28,.42) 0%, rgba(4,12,28,.8) 100%),
+    repeating-linear-gradient(180deg,var(--quadra) 0 72px,var(--quadra-faixa) 72px 144px);
 }
-.quadra-fundo i{position:absolute; border:2px solid rgba(255,255,255,.45)}
+.quadra-fundo i{position:absolute; border:2px solid rgba(255,255,255,.26)}
 .q-lateral{inset:10px}
 .q-meio{left:10px; right:10px; top:50%; border-width:2px 0 0}
 .q-circulo{width:min(46vw,230px); aspect-ratio:1; border-radius:50%; left:50%; top:50%; transform:translate(-50%,-50%)}
@@ -52,21 +55,42 @@ button,input{font:inherit; color:inherit}
 .q-area-cima{top:10px; border-top-width:0; border-radius:0 0 50% 50% / 0 0 100% 100%}
 .q-area-baixo{bottom:10px; border-bottom-width:0; border-radius:50% 50% 0 0 / 100% 100% 0 0}
 
-.pagina{position:relative; z-index:1; max-width:560px; margin:0 auto; padding:14px 12px 40px}
-@media (min-width:600px){ .pagina{padding-top:28px} }
 .so-leitor{position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap}
+
+/* ---------- Grade da página ----------
+   Celular: uma coluna, na ordem de uso. Tela larga: três colunas
+   (placar e entrada | lista do baba | bola paga e faltas). */
+.pagina{
+  position:relative; z-index:1; max-width:1240px; margin:0 auto; padding:44px 12px 32px;
+  display:flex; flex-direction:column; gap:12px;
+}
+.col{display:contents}
+.placar-estadio{order:1} .faixa-modo{order:2} .entrada,.so-leitura{order:3}
+.p-conf{order:4} .p-banco{order:5} .p-bola{order:6} .p-faltas{order:7}
+.org-pin{order:8} .regras{order:9} .rodape{order:10}
+
+@media (min-width:700px){
+  .pagina{display:grid; grid-template-columns:minmax(0,380px) minmax(0,1fr); align-items:start; gap:14px; padding-left:16px; padding-right:16px}
+  .col{display:flex; flex-direction:column; gap:14px; min-width:0}
+  .col-c{grid-column:1 / -1; display:grid; grid-template-columns:1fr 1fr; align-items:start}
+  .rodape{grid-column:1 / -1}
+}
+@media (min-width:1060px){
+  .pagina{grid-template-columns:minmax(0,370px) minmax(0,1fr) minmax(0,330px)}
+  .col-c{grid-column:auto; display:flex; align-items:stretch}
+}
 
 /* ---------- Placar de estádio ---------- */
 .placar-estadio{
   --led-amb:#FFB300; --led-branco:#F3F6FB; --led-verm:#FF5140;
-  position:relative; margin-top:30px; padding:38px 14px 16px; color:#fff; border-radius:10px;
+  position:relative; padding:38px 14px 16px; color:#fff; border-radius:10px;
   background:linear-gradient(180deg,#161D2A,#0A0F18);
   border:2px solid #2C374A;
   box-shadow:0 0 0 3px #06090F, 0 14px 26px rgba(3,12,28,.5);
 }
 /* Escudo preso no alto do placar */
 .escudo{position:absolute; top:-30px; left:50%; width:56px; height:auto; transform:translateX(-50%); filter:drop-shadow(0 3px 0 #06090F)}
-.escudo-bm{font:900 17px var(--display); fill:#fff; letter-spacing:.06em}
+.escudo-sigla{font:900 16px var(--display); fill:#fff; letter-spacing:.05em}
 .pe-rotulo{
   display:block; margin:14px 0 5px; text-align:center; color:rgba(255,255,255,.74);
   font:700 18px/1 var(--display); text-transform:uppercase; letter-spacing:.07em;
@@ -106,19 +130,30 @@ button,input{font:inherit; color:inherit}
 .pe-banco{margin:10px 0 0; text-align:center; font-size:14px; font-weight:500; color:var(--led-amb)}
 .pe-banco[hidden]{display:none}
 
-/* ---------- Corpo ---------- */
-main{padding:0}
-.faixa-modo{margin:12px 0 0; padding:10px 14px; background:var(--papel); border:1.5px dashed var(--tinta-2); border-radius:10px; font-size:14px; color:var(--tinta-2)}
-.faixa-modo[hidden]{display:none}
+/* ---------- Painéis ---------- */
+.painel{min-width:0; padding:14px 16px 16px; background:var(--papel); border-radius:10px}
+.painel-topo{display:flex; align-items:baseline; justify-content:space-between; gap:12px; border-bottom:3px solid var(--tinta); padding-bottom:4px}
+.painel h2{margin:0; display:flex; align-items:center; gap:8px; font:700 28px/1 var(--display); letter-spacing:.01em}
+.painel h2 svg{width:18px; height:18px; flex:none}
+.painel-conta{font-size:14px; color:var(--tinta-2); font-weight:500; white-space:nowrap}
+.dica{margin:8px 0 0; font-size:14px; color:var(--tinta-2)}
+.i-bola circle{fill:var(--papel); stroke:var(--tinta); stroke-width:1.6}
+.i-bola path{fill:var(--tinta)}
+.i-cartao rect{fill:var(--cartao); stroke:var(--tinta); stroke-width:1}
 
-.entrada{margin-top:12px; padding:16px; background:var(--papel); border-radius:10px}
-.entrada[hidden]{display:none}
+.faixa-modo{margin:0; padding:12px 14px; background:var(--cartao); border-radius:10px; font-size:15px; font-weight:600; color:#10233D}
+.faixa-modo a{color:inherit}
+.so-leitura{margin:0; padding:14px 16px; background:var(--papel); border-radius:10px; color:var(--tinta-2)}
+
+/* ---------- Botar nome ---------- */
 .entrada label{display:block; font-weight:600; margin-bottom:8px}
-.entrada-linha{display:flex; gap:10px}
+.linha-campo{display:flex; gap:8px}
+.entrada .linha-campo{flex-direction:column; gap:10px}
 .campo-texto{
   flex:1; min-width:0; height:50px; padding:0 14px; font-size:17px;
   background:var(--fundo); border:1.5px solid var(--risca); border-radius:6px;
 }
+.entrada .campo-texto{flex:none; width:100%}
 .campo-texto::placeholder{color:var(--tinta-2); opacity:.8}
 .botao{
   height:50px; padding:0 18px; border:0; border-radius:6px; cursor:pointer;
@@ -126,87 +161,86 @@ main{padding:0}
 }
 .botao:focus-visible{outline-color:var(--tinta)}
 .botao:disabled{opacity:.55; cursor:default}
-@media (max-width:480px){
-  .entrada > .entrada-linha{flex-direction:column}
-  .entrada > .entrada-linha .campo-texto{flex:none; width:100%}
-}
-
-.aviso{min-height:22px; margin:10px 2px 0; font-size:15px; font-weight:500}
+.aviso{margin:10px 2px 0; font-size:15px; font-weight:500}
+.aviso:empty{display:none}
 .aviso.erro{color:var(--erro)}
-.so-leitura{margin:12px 0 0; padding:14px 16px; background:var(--papel); border-radius:10px; color:var(--tinta-2)}
-.so-leitura[hidden]{display:none}
 
-.secao{margin-top:12px; padding:16px; background:var(--papel); border-radius:10px}
-.secao[hidden]{display:none}
-.secao-topo{display:flex; align-items:baseline; justify-content:space-between; gap:12px; border-bottom:3px solid var(--tinta); padding-bottom:4px}
-.secao h2{margin:0; font:700 30px/1 var(--display); letter-spacing:.01em}
-.secao-conta{font-size:14px; color:var(--tinta-2); font-weight:500}
-.secao-dica{margin:8px 0 0; font-size:14px; color:var(--tinta-2)}
-
-.elenco{list-style:none; margin:0; padding:0}
-.jogador{
-  display:grid; grid-template-columns:44px 1fr auto; align-items:center; gap:12px;
-  padding:9px 2px; border-bottom:1px solid var(--risca);
+/* ---------- Lista do baba: duas colunas, lendo de cima pra baixo ---------- */
+.elenco{
+  list-style:none; margin:6px 0 0; padding:0; display:grid; column-gap:16px;
+  grid-auto-flow:column; grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-template-rows:repeat(var(--linhas,1),auto);
 }
-.elenco .jogador:last-child{border-bottom:0; padding-bottom:0}
+.jogador{
+  display:grid; grid-template-columns:30px minmax(0,1fr) auto; align-items:center; gap:9px;
+  min-height:44px; padding:6px 0; border-bottom:1px solid var(--risca);
+}
 .jogador.recem{animation:entrou 1.8s ease-out}
 @keyframes entrou{ from{background:var(--destaque)} to{background:transparent} }
 @media (prefers-reduced-motion: reduce){ .jogador.recem{animation:none} }
 
-.camisa{width:44px; height:40px; display:block}
+.camisa{width:30px; height:27px; display:block}
 .camisa path{fill:var(--camisa)}
 .camisa text{font:900 19px var(--display); fill:var(--na-camisa)}
 .jogador.banco .camisa path{fill:none; stroke:var(--tinta-2); stroke-width:1.5; stroke-dasharray:3 2.5}
 .jogador.banco .camisa text{fill:var(--tinta-2)}
 
-.jogador-corpo{min-width:0; display:flex; flex-direction:column; gap:3px}
-.jogador-nome{font-weight:600; font-size:17px; overflow-wrap:anywhere}
-.tags{display:flex; flex-wrap:wrap; gap:4px 12px}
-.tag{display:inline-flex; align-items:center; gap:5px; font-size:13px; color:var(--tinta-2); font-weight:500}
-.tag svg{width:14px; height:14px; flex:none}
-.tag-bola svg circle{fill:var(--papel); stroke:var(--tinta); stroke-width:1.6}
-.tag-bola svg path{fill:var(--tinta)}
-.tag-cartao svg rect{fill:var(--cartao); stroke:var(--tinta); stroke-width:1}
+.jogador-nome{font-weight:600; font-size:15px; line-height:1.2; overflow-wrap:anywhere}
+.marca{display:inline-block; margin-left:5px; vertical-align:-2px}
+.marca svg{display:block; width:14px; height:14px}
 
+.tirar{
+  display:grid; place-items:center; width:30px; height:30px; padding:0; cursor:pointer;
+  border:1.5px solid var(--risca); background:transparent; border-radius:6px;
+  color:var(--tinta-2); font-size:13px; font-weight:600; line-height:1;
+}
+.tirar svg{width:11px; height:11px}
+.tirar.confirma{width:auto; padding:0 8px; border-color:var(--erro); color:var(--erro)}
+.vazio{margin:12px 0 0; color:var(--tinta-2)}
+
+/* ---------- Bola paga e faltas (todo mundo vê, só a organização mexe) ---------- */
+.nomes{list-style:none; margin:8px 0 0; padding:0; display:grid; column-gap:14px; grid-template-columns:repeat(auto-fill,minmax(128px,1fr))}
+.nomes li{
+  display:flex; align-items:center; justify-content:space-between; gap:6px;
+  min-height:30px; padding:4px 0; border-bottom:1px solid var(--risca);
+  font-size:14.5px; font-weight:500; line-height:1.2;
+}
+.nomes li > span{min-width:0; overflow-wrap:anywhere}
+.nomes .nada{grid-column:1 / -1; border:0; color:var(--tinta-2); font-weight:400}
+.nomes .tirar{width:26px; height:26px; flex:none}
+
+.org-area{margin-top:12px; padding-top:12px; border-top:2px dashed var(--risca)}
+.org-area h3{margin:0 0 8px; font-size:15px; font-weight:600}
+.org-area .campo-texto,.org-area .botao{height:42px; font-size:16px}
+.marcar{display:flex; flex-wrap:wrap; gap:6px}
+.marcar .nada{font-size:14px; color:var(--tinta-2)}
+.abas{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px}
 .botao-leve{
   border:1.5px solid var(--risca); background:transparent; border-radius:6px;
-  padding:7px 11px; font-size:14px; font-weight:500; cursor:pointer; white-space:nowrap;
+  padding:6px 10px; font-size:14px; font-weight:500; cursor:pointer;
 }
-.botao-leve.confirma{border-color:var(--erro); color:var(--erro)}
-.botao-leve[aria-pressed="true"]{background:var(--cartao); border-color:var(--cartao); color:#10233D}
+.marcar .botao-leve[aria-pressed="true"]{background:var(--cartao); border-color:var(--cartao); color:#10233D}
+.abas .botao-leve[aria-pressed="true"]{background:var(--tinta); border-color:var(--tinta); color:var(--papel)}
 
-.vazio{margin:14px 2px 0; color:var(--tinta-2)}
+.org-pin h2{margin-bottom:10px}
+.org-pin .campo-texto,.org-pin .botao{height:44px}
 
-.regras ol{margin:12px 0 0; padding-left:22px}
-.regras li{margin:4px 0}
-.regras p{margin:10px 0 0; color:var(--tinta-2); font-size:15px}
+.regras ol{margin:10px 0 0; padding-left:22px}
+.regras li{margin:3px 0}
+.regras p{margin:8px 0 0; color:var(--tinta-2); font-size:14.5px}
 
-/* ---------- Organização ---------- */
-.org{margin-top:12px; padding:16px; background:var(--papel); border:2px dashed var(--tinta-2); border-radius:10px}
-.org[hidden]{display:none}
-.org h2{margin:0; font:700 30px/1 var(--display)}
-.org h3{margin:20px 0 6px; font-size:16px; font-weight:600}
-.org p{margin:0 0 10px; font-size:14px; color:var(--tinta-2)}
-.org .entrada-linha{margin-top:8px}
-.org .campo-texto,.org .botao{height:44px}
-.org-lista{list-style:none; margin:8px 0 0; padding:0}
-.org-lista li{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:7px 0; border-bottom:1px solid var(--risca)}
-.org-lista span{font-weight:500; overflow-wrap:anywhere; min-width:0}
-.abas{display:flex; gap:8px; margin-top:8px}
-.abas[hidden]{display:none}
-.abas .botao-leve[aria-pressed="true"]{background:var(--tinta); border-color:var(--tinta); color:var(--fundo)}
-
-.rodape{margin:22px 6px 0; display:flex; justify-content:space-between; align-items:center; gap:12px; font-size:14px; color:#fff}
+.rodape{margin:8px 6px 0; display:flex; justify-content:space-between; align-items:center; gap:12px; font-size:14px; color:rgba(255,255,255,.88)}
 .rodape :focus-visible{outline-color:#fff}
 .link{background:none; border:0; padding:4px 0; color:inherit; text-decoration:underline; cursor:pointer; font-size:14px}
-.link[hidden]{display:none}
 </style>
 </head>
 <body>
 <div class="quadra-fundo" aria-hidden="true"><i class="q-lateral"></i><i class="q-meio"></i><i class="q-circulo"></i><i class="q-area q-area-cima"></i><i class="q-area q-area-baixo"></i></div>
-<div class="pagina">
 
-  <header class="placar-estadio">
+<main class="pagina">
+
+  <div class="col col-a">
+    <header class="placar-estadio">
       <svg class="escudo" viewBox="0 0 64 72" aria-hidden="true">
         <defs><clipPath id="esc"><path d="M32 3 59 11v24c0 16-12 26-27 33C17 61 5 51 5 35V11Z"/></clipPath></defs>
         <g clip-path="url(#esc)">
@@ -216,41 +250,40 @@ main{padding:0}
           <rect width="64" height="25" fill="#0B1E3A"/>
         </g>
         <path d="M32 3 59 11v24c0 16-12 26-27 33C17 61 5 51 5 35V11Z" fill="none" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>
-        <text class="escudo-bm" x="32" y="21" text-anchor="middle">BM</text>
+        <text class="escudo-sigla" x="32" y="21" text-anchor="middle">CMC</text>
         <circle cx="32" cy="43" r="11" fill="#fff" stroke="#0B1E3A" stroke-width="2"/>
         <path d="M32 37.5l5.2 3.8-2 6.1h-6.4l-2-6.1Z" fill="#0B1E3A"/>
       </svg>
-    <div class="led led-titulo"><h1 class="led-texto" id="ledTitulo">Baba Mirantes</h1></div>
+      <div class="led led-titulo"><h1 class="led-texto" id="ledTitulo">Baba Mirantes</h1></div>
 
-    <p class="so-leitor" id="quando"></p>
-    <span class="pe-rotulo" id="rotuloQuando" aria-hidden="true">Próximo baba</span>
-    <div class="pe-linha" aria-hidden="true">
-      <div class="led led-data">
-        <span class="led-texto pisca" id="ledData"><span id="ledDia"></span><span id="ledMes"></span></span>
+      <p class="so-leitor" id="quando"></p>
+      <span class="pe-rotulo" id="rotuloQuando" aria-hidden="true">Próximo baba</span>
+      <div class="pe-linha" aria-hidden="true">
+        <div class="led led-data">
+          <span class="led-texto pisca" id="ledData"><span id="ledDia"></span><span id="ledMes"></span></span>
+        </div>
+        <div class="led led-hora" id="caixaHora"><span class="led-texto" id="ledHora"></span></div>
       </div>
-      <div class="led led-hora" id="caixaHora"><span class="led-texto" id="ledHora"></span></div>
-    </div>
 
-    <div class="pe-contagem" id="placar" role="group">
-      <div class="pe-lado" aria-hidden="true">
-        <span class="pe-rotulo">Confirmados</span>
-        <div class="led led-num"><span class="led-texto" id="pConf">00</span></div>
+      <div class="pe-contagem" id="placar" role="group">
+        <div class="pe-lado" aria-hidden="true">
+          <span class="pe-rotulo">Confirmados</span>
+          <div class="led led-num"><span class="led-texto" id="pConf">00</span></div>
+        </div>
+        <span class="pe-x" aria-hidden="true">×</span>
+        <div class="pe-lado" aria-hidden="true">
+          <span class="pe-rotulo">Vagas livres</span>
+          <div class="led led-num" id="caixaVagas"><span class="led-texto" id="pVagas">20</span></div>
+        </div>
       </div>
-      <span class="pe-x" aria-hidden="true">×</span>
-      <div class="pe-lado" aria-hidden="true">
-        <span class="pe-rotulo">Vagas livres</span>
-        <div class="led led-num" id="caixaVagas"><span class="led-texto" id="pVagas">20</span></div>
-      </div>
-    </div>
-    <p class="pe-banco" id="pBanco" hidden></p>
-  </header>
+      <p class="pe-banco" id="pBanco" hidden></p>
+    </header>
 
-  <main>
     <p class="faixa-modo" id="faixaModo" hidden></p>
 
-    <div class="entrada" id="entrada">
+    <div class="painel entrada" id="entrada">
       <label for="campoNome">Vai pro baba? Bota teu nome.</label>
-      <div class="entrada-linha">
+      <div class="linha-campo">
         <input class="campo-texto" id="campoNome" type="text" maxlength="30" autocomplete="off" autocapitalize="words" enterkeyhint="done" placeholder="Nome ou apelido" list="sugestoes">
         <button class="botao" id="botaoEntrar" type="button">Botar nome na lista</button>
       </div>
@@ -259,68 +292,87 @@ main{padding:0}
     </div>
     <p class="so-leitura" id="soLeitura" hidden>Você está só olhando a lista. Para botar teu nome, peça ao dono da página acesso de colaborador.</p>
 
-    <section class="secao" aria-labelledby="tConf">
-      <div class="secao-topo">
+  </div>
+
+  <div class="col col-b">
+    <section class="painel p-conf" aria-labelledby="tConf">
+      <div class="painel-topo">
         <h2 id="tConf">Confirmados</h2>
-        <span class="secao-conta" id="contaConf"></span>
+        <span class="painel-conta" id="contaConf"></span>
       </div>
       <ol class="elenco" id="listaConf"></ol>
       <p class="vazio" id="vazio" hidden></p>
     </section>
 
-    <section class="secao" id="secaoBanco" aria-labelledby="tBanco" hidden>
-      <div class="secao-topo">
+    <section class="painel p-banco" id="secaoBanco" aria-labelledby="tBanco" hidden>
+      <div class="painel-topo">
         <h2 id="tBanco">Banco de reservas</h2>
-        <span class="secao-conta" id="contaBanco"></span>
+        <span class="painel-conta" id="contaBanco"></span>
       </div>
-      <p class="secao-dica">Entra na lista quando alguém confirmado tirar o nome.</p>
+      <p class="dica">Entra na lista quando alguém confirmado tirar o nome.</p>
       <ol class="elenco" id="listaBanco"></ol>
     </section>
+  </div>
 
-    <section class="secao regras" aria-labelledby="tRegras">
-      <div class="secao-topo"><h2 id="tRegras">Como a lista é ordenada</h2></div>
+  <div class="col col-c">
+    <section class="painel p-bola" aria-labelledby="tBola">
+      <div class="painel-topo">
+        <h2 id="tBola"><svg class="i-bola" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.6"/><path d="M8 4.6l3 2.2-1.1 3.5H6.1L5 6.8Z"/></svg>Bola paga</h2>
+        <span class="painel-conta" id="contaBola"></span>
+      </div>
+      <p class="dica">Passam na frente de quem não pagou.</p>
+      <ul class="nomes" id="listaBola"></ul>
+      <div class="org-area" id="orgBola" hidden>
+        <h3>Organização: adicionar quem pagou</h3>
+        <div class="linha-campo">
+          <input class="campo-texto" id="campoBola" type="text" maxlength="30" autocomplete="off" placeholder="Nome" list="sugestoes" aria-label="Nome de quem pagou a bola">
+          <button class="botao" id="botaoBola" type="button">Adicionar</button>
+        </div>
+        <p class="aviso" id="avisoOrg" role="status" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <section class="painel p-faltas" aria-labelledby="tFaltas">
+      <div class="painel-topo">
+        <h2 id="tFaltas"><svg class="i-cartao" viewBox="0 0 16 16" aria-hidden="true"><rect x="4" y="1.5" width="8.5" height="13" rx="1.5" transform="rotate(8 8 8)"/></svg>Faltaram no último baba</h2>
+        <span class="painel-conta" id="contaFaltas"></span>
+      </div>
+      <p class="dica">Botaram o nome e não foram. Ficam no fim da fila neste baba.</p>
+      <ul class="nomes" id="listaFaltas"></ul>
+      <div class="org-area" id="orgFaltas" hidden>
+        <h3 id="tMarcar">Organização: marcar faltas</h3>
+        <div class="abas" id="abas" hidden></div>
+        <div class="marcar" id="listaMarcar"></div>
+        <p class="aviso" id="avisoFaltas" role="status" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <section class="painel regras" aria-labelledby="tRegras">
+      <div class="painel-topo"><h2 id="tRegras">Como a lista é ordenada</h2></div>
       <ol>
         <li>Quem pagou a bola.</li>
         <li>Quem não pagou a bola.</li>
         <li>Quem botou o nome e faltou no baba passado.</li>
       </ol>
-      <p>Dentro de cada grupo vale quem botou o nome primeiro. São <span id="regraVagas">20</span> vagas, o resto fica no banco de reservas. A falta pesa só no baba seguinte.</p>
+      <p>Em cada grupo vale quem botou o nome primeiro. São <span id="regraVagas">20</span> vagas, o resto fica no banco de reservas. A falta pesa só no baba seguinte.</p>
     </section>
 
-    <section class="org" id="org" aria-labelledby="tOrg" hidden>
-      <h2 id="tOrg">Organização</h2>
-
-      <h3>Bola paga</h3>
-      <p>Quem está aqui passa na frente de quem não pagou.</p>
-      <div class="entrada-linha">
-        <input class="campo-texto" id="campoBola" type="text" maxlength="30" autocomplete="off" placeholder="Nome de quem pagou" list="sugestoes" aria-label="Nome de quem pagou a bola">
-        <button class="botao" id="botaoBola" type="button">Adicionar</button>
-      </div>
-      <ul class="org-lista" id="listaBola"></ul>
-
-      <h3 id="tFaltas">Quem faltou</h3>
-      <p>Marque quem botou o nome e não apareceu. Essa pessoa vai pro fim da fila no baba seguinte.</p>
-      <div class="abas" id="abas" hidden></div>
-      <ul class="org-lista" id="listaFaltas"></ul>
-
-      <p class="aviso" id="avisoOrg" role="status" aria-live="polite"></p>
-    </section>
-
-    <div class="org" id="orgPin" hidden>
+    <div class="painel org-pin" id="orgPin" hidden>
       <h2>Organização</h2>
-      <div class="entrada-linha">
+      <div class="linha-campo">
         <input class="campo-texto" id="campoPin" type="password" autocomplete="off" placeholder="PIN da organização" aria-label="PIN da organização">
         <button class="botao" id="botaoPin" type="button">Entrar</button>
       </div>
       <p class="aviso" id="avisoPin" role="status" aria-live="polite"></p>
     </div>
-  </main>
+  </div>
 
   <footer class="rodape">
     <span>Baba Mirantes, toda terça.</span>
     <button class="link" id="linkOrg" type="button" hidden>Sou da organização</button>
+    <span id="orgAtiva" hidden>Modo organização ativo</span>
   </footer>
-</div>
+</main>
 
 <script>
 (() => {
@@ -332,11 +384,12 @@ main{padding:0}
    Supabase abaixo depois de rodar o supabase.sql no projeto.
    ===================================================================== */
 const CONFIG = {
-  SUPABASE_URL: 'https://nmoiqluewoobkgivffrv.supabase.co',
-  SUPABASE_KEY: 'sb_publishable_uWeWCTGgHR61ivk8PHx_mg_3N6llj71',   // chave pública (publishable), pode ficar no código
+  SUPABASE_URL: '',   // ex.: https://abcdefgh.supabase.co
+  SUPABASE_KEY: '',   // chave anon (ou publishable) do projeto
   VAGAS: 20,
   DIA_DO_BABA: 2,     // 0 = domingo, 1 = segunda, 2 = terça...
   HORARIO: '19h',     // aparece no cabeçalho; deixe '' para esconder
+  LINK_OFICIAL: 'https://baba-mirantes.vercel.app',   // mostrado quando a página abre sem ligação com a lista
 };
 
 /* ---------- Datas ---------- */
@@ -549,14 +602,23 @@ const el = (tag, cls, txt) => { const n = document.createElement(tag); if (cls) 
 
 const CAMISA = n => `<svg class="camisa" viewBox="0 0 44 40" aria-hidden="true"><path d="M14 3 4 9 1 19l8 3 2-4v19h22V18l2 4 8-3-3-10-10-6c-2 4-14 4-16 0Z"/><text x="22" y="29.5" text-anchor="middle">${n}</text></svg>`;
 const ICONE = {
-  bola: '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.6"/><path d="M8 4.6l3 2.2-1.1 3.5H6.1L5 6.8Z"/></svg>',
-  cartao: '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="4" y="1.5" width="8.5" height="13" rx="1.5" transform="rotate(8 8 8)"/></svg>',
+  bola: '<svg class="i-bola" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.6"/><path d="M8 4.6l3 2.2-1.1 3.5H6.1L5 6.8Z"/></svg>',
+  cartao: '<svg class="i-cartao" viewBox="0 0 16 16" aria-hidden="true"><rect x="4" y="1.5" width="8.5" height="13" rx="1.5" transform="rotate(8 8 8)"/></svg>',
 };
-function tag(tipo, texto) {
-  const t = el('span', 'tag tag-' + tipo);
-  t.innerHTML = ICONE[tipo];
-  t.append(texto);
-  return t;
+function marca(tipo, texto) {
+  const m = el('span', 'marca');
+  m.innerHTML = ICONE[tipo];
+  m.title = texto.charAt(0).toUpperCase() + texto.slice(1);
+  m.append(el('span', 'so-leitor', ` (${texto})`));
+  return m;
+}
+const X = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+function botaoX(rotulo, aoClicar) {
+  const b = el('button', 'tirar'); b.type = 'button';
+  b.innerHTML = X;
+  b.setAttribute('aria-label', rotulo);
+  b.addEventListener('click', aoClicar);
+  return b;
 }
 
 function avisar(texto, erro = false, alvo = 'aviso') {
@@ -568,21 +630,14 @@ function avisar(texto, erro = false, alvo = 'aviso') {
 function linha(e, numero, banco) {
   const li = el('li', 'jogador' + (banco ? ' banco' : '') + (S.recem === e.chave ? ' recem' : ''));
   li.innerHTML = CAMISA(numero);
-  const corpo = el('div', 'jogador-corpo');
-  corpo.append(el('span', 'jogador-nome', e.nome));
-  if (e.bola || e.faltou) {
-    const tags = el('span', 'tags');
-    if (e.bola) tags.append(tag('bola', 'Bola paga'));
-    if (e.faltou) tags.append(tag('cartao', 'Faltou no último baba'));
-    corpo.append(tags);
-  }
-  li.append(corpo);
+  const nome = el('span', 'jogador-nome', e.nome);
+  if (e.bola) nome.append(marca('bola', 'bola paga'));
+  if (e.faltou) nome.append(marca('cartao', 'faltou no último baba'));
+  li.append(nome);
   if (S.podeEscrever && loja && loja.meu(e)) {
     const confirmando = S.confirmando === e.chave;
-    const b = el('button', 'botao-leve' + (confirmando ? ' confirma' : ''), confirmando ? 'Confirma?' : 'Tirar');
-    b.type = 'button';
-    b.setAttribute('aria-label', (confirmando ? 'Confirmar: tirar ' : 'Tirar ') + e.nome + ' da lista');
-    b.addEventListener('click', () => tirar(e));
+    const b = botaoX((confirmando ? 'Confirmar: tirar ' : 'Tirar ') + e.nome + ' da lista', () => tirar(e));
+    if (confirmando) { b.classList.add('confirma'); b.textContent = 'Tirar?'; }
     li.append(b);
   }
   return li;
@@ -599,6 +654,12 @@ function pintarData() {
   $('ledMes').textContent = mes;
   $('caixaHora').hidden = !CONFIG.HORARIO;
   $('ledHora').textContent = CONFIG.HORARIO;
+}
+
+function preencherElenco(ol, itens, primeiroNumero, banco) {
+  ol.style.setProperty('--linhas', Math.max(1, Math.ceil(itens.length / 2)));
+  ol.start = primeiroNumero;
+  ol.replaceChildren(...itens.map((e, i) => linha(e, primeiroNumero + i, banco)));
 }
 
 function render() {
@@ -618,13 +679,20 @@ function render() {
 
   const faixa = $('faixaModo');
   faixa.hidden = S.modo !== 'demo';
-  if (S.modo === 'demo') faixa.textContent = 'Modo de demonstração: os nomes somem quando a página recarrega.';
+  if (S.modo === 'demo' && !faixa.firstChild) {
+    faixa.append('Atenção: esta página não está ligada à lista de verdade. Os nomes botados aqui não são salvos e ninguém mais vê.');
+    if (CONFIG.LINK_OFICIAL) {
+      const a = el('a', null, CONFIG.LINK_OFICIAL.replace(/^https?:\/\//, ''));
+      a.href = CONFIG.LINK_OFICIAL; a.target = '_blank'; a.rel = 'noopener';
+      faixa.append(' A lista oficial fica em ', a, '.');
+    }
+  }
 
   $('entrada').hidden = !S.podeEscrever;
   $('soLeitura').hidden = S.podeEscrever;
 
   $('contaConf').textContent = S.pronto ? `${dentro.length} de ${CONFIG.VAGAS}` : '';
-  $('listaConf').replaceChildren(...dentro.map((e, i) => linha(e, i + 1, false)));
+  preencherElenco($('listaConf'), dentro, 1, false);
   const vazio = $('vazio');
   vazio.hidden = dentro.length > 0;
   vazio.textContent = !S.pronto ? 'Carregando a lista…'
@@ -632,9 +700,7 @@ function render() {
 
   $('secaoBanco').hidden = banco.length === 0;
   $('contaBanco').textContent = banco.length === 1 ? '1 na fila' : `${banco.length} na fila`;
-  const olBanco = $('listaBanco');
-  olBanco.start = CONFIG.VAGAS + 1;
-  olBanco.replaceChildren(...banco.map((e, i) => linha(e, CONFIG.VAGAS + i + 1, true)));
+  preencherElenco($('listaBanco'), banco, CONFIG.VAGAS + 1, true);
 
   // Sugestões de nome: quem pagou a bola e quem veio no baba passado
   const vistos = new Set(S.nomes[JOGO].map(e => e.chave));
@@ -642,54 +708,69 @@ function render() {
   for (const x of [...S.bola, ...S.nomes[ANTERIOR]]) if (!vistos.has(x.chave)) sug.set(x.chave, x.nome);
   $('sugestoes').replaceChildren(...[...sug.values()].map(n => { const o = el('option'); o.value = n; return o; }));
 
-  renderOrg();
+  renderListas();
 }
 
-function renderOrg() {
-  const temPin = loja && typeof loja.autenticar === 'function';
-  $('org').hidden = !S.organizador;
-  $('linkOrg').hidden = !(temPin && !S.organizador && $('orgPin').hidden);
-  if (S.organizador) $('orgPin').hidden = true;
-  if (!S.organizador) return;
+// Bola paga e faltas: todo mundo vê; os controles só aparecem pra organização.
+function renderListas() {
+  const org = S.organizador;
+  const porNome = (a, b) => a.nome.localeCompare(b.nome, 'pt-BR');
+  const itemNome = (p, rotuloTirar, aoTirar) => {
+    const li = el('li'); li.append(el('span', null, p.nome));
+    if (org) li.append(botaoX(rotuloTirar, aoTirar));
+    return li;
+  };
 
   // Bola paga
-  const pagos = [...S.bola].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
-  const ulBola = $('listaBola');
-  if (!pagos.length) ulBola.replaceChildren(el('li', null, 'Ninguém na lista da bola ainda.'));
-  else ulBola.replaceChildren(...pagos.map(p => {
-    const li = el('li'); li.append(el('span', null, p.nome));
-    const b = el('button', 'botao-leve', 'Remover'); b.type = 'button';
-    b.setAttribute('aria-label', 'Remover ' + p.nome + ' da bola paga');
-    b.addEventListener('click', () => acaoOrg(() => loja.bola(p.chave, p.nome, false)));
-    li.append(b); return li;
-  }));
+  const pagos = [...S.bola].sort(porNome);
+  $('contaBola').textContent = !S.pronto ? '' : pagos.length === 1 ? '1 nome' : `${pagos.length} nomes`;
+  $('listaBola').replaceChildren(...(pagos.length
+    ? pagos.map(p => itemNome(p, `Remover ${p.nome} da bola paga`, () => acaoOrg(() => loja.bola(p.chave, p.nome, false))))
+    : [el('li', 'nada', S.pronto ? 'Ninguém na lista da bola ainda.' : 'Carregando…')]));
+  $('orgBola').hidden = !org;
 
-  // Faltas
-  const abas = $('abas');
-  abas.hidden = !EH_HOJE;
-  if (EH_HOJE) {
-    abas.replaceChildren(...[[JOGO, `Hoje (${dataCurta(dataBaba)})`], [ANTERIOR, `Terça passada (${dataCurta(dataAnterior)})`]].map(([j, rotulo]) => {
-      const b = el('button', 'botao-leve', rotulo); b.type = 'button';
-      b.setAttribute('aria-pressed', String(S.abaFaltas === j));
-      b.addEventListener('click', () => { S.abaFaltas = j; render(); });
-      return b;
-    }));
+  // Faltas do último baba (as que valem pra fila de agora)
+  const faltaram = [...S.faltas[ANTERIOR]].sort(porNome);
+  $('contaFaltas').textContent = dataCurta(dataAnterior);
+  $('listaFaltas').replaceChildren(...(faltaram.length
+    ? faltaram.map(p => itemNome(p, `Tirar a falta de ${p.nome}`, () => acaoOrg(() => loja.falta(ANTERIOR, p.chave, p.nome, false), 'avisoFaltas')))
+    : [el('li', 'nada', S.pronto ? 'Ninguém faltou.' : 'Carregando…')]));
+  $('orgFaltas').hidden = !org;
+
+  if (org) {
+    const abas = $('abas');
+    abas.hidden = !EH_HOJE;
+    if (EH_HOJE) {
+      abas.replaceChildren(...[[JOGO, `Hoje (${dataCurta(dataBaba)})`], [ANTERIOR, `Terça passada (${dataCurta(dataAnterior)})`]].map(([j, rotulo]) => {
+        const b = el('button', 'botao-leve', rotulo); b.type = 'button';
+        b.setAttribute('aria-pressed', String(S.abaFaltas === j));
+        b.addEventListener('click', () => { S.abaFaltas = j; render(); });
+        return b;
+      }));
+    }
+    const j = S.abaFaltas;
+    $('tMarcar').textContent = j === JOGO
+      ? `Organização: marcar quem faltou hoje (${dataCurta(dataBaba)})`
+      : `Organização: marcar quem faltou em ${dataCurta(dataAnterior)}`;
+    const faltou = new Set(S.faltas[j].map(f => f.chave));
+    const inscritos = [...S.nomes[j]].sort(porNome);
+    $('listaMarcar').replaceChildren(...(inscritos.length
+      ? inscritos.map(p => {
+          const marcado = faltou.has(p.chave);
+          const b = el('button', 'botao-leve', p.nome); b.type = 'button';
+          b.setAttribute('aria-pressed', String(marcado));
+          b.setAttribute('aria-label', (marcado ? 'Desmarcar falta de ' : 'Marcar falta de ') + p.nome);
+          b.addEventListener('click', () => acaoOrg(() => loja.falta(j, p.chave, p.nome, !marcado), 'avisoFaltas'));
+          return b;
+        })
+      : [el('span', 'nada', 'Ninguém botou o nome nesse baba.')]));
   }
-  const j = S.abaFaltas;
-  $('tFaltas').textContent = j === JOGO ? `Quem faltou hoje (${dataCurta(dataBaba)})` : `Quem faltou no baba passado (${dataCurta(dataAnterior)})`;
-  const faltou = new Set(S.faltas[j].map(f => f.chave));
-  const presentes = [...S.nomes[j]].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
-  const ulF = $('listaFaltas');
-  if (!presentes.length) ulF.replaceChildren(el('li', null, 'Ninguém botou o nome nesse baba.'));
-  else ulF.replaceChildren(...presentes.map(p => {
-    const marcado = faltou.has(p.chave);
-    const li = el('li'); li.append(el('span', null, p.nome));
-    const b = el('button', 'botao-leve', marcado ? 'Faltou' : 'Marcar falta'); b.type = 'button';
-    b.setAttribute('aria-pressed', String(marcado));
-    b.setAttribute('aria-label', (marcado ? 'Desmarcar falta de ' : 'Marcar falta de ') + p.nome);
-    b.addEventListener('click', () => acaoOrg(() => loja.falta(j, p.chave, p.nome, !marcado)));
-    li.append(b); return li;
-  }));
+
+  // Entrada da organização por PIN (só existe fora do Claude)
+  const temPin = loja && typeof loja.autenticar === 'function';
+  if (org) $('orgPin').hidden = true;
+  $('linkOrg').hidden = !(temPin && !org && $('orgPin').hidden);
+  $('orgAtiva').hidden = !(temPin && org);
 }
 
 /* ---------- Ações ---------- */
@@ -736,9 +817,9 @@ async function tirar(e) {
   render();
 }
 
-async function acaoOrg(fazer) {
-  try { await fazer(); avisar('', false, 'avisoOrg'); }
-  catch (e) { avisar(traduzErro(e), true, 'avisoOrg'); }
+async function acaoOrg(fazer, alvo = 'avisoOrg') {
+  try { await fazer(); avisar('', false, alvo); }
+  catch (e) { avisar(traduzErro(e), true, alvo); }
   render();
 }
 
