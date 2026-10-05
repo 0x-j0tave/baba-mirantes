@@ -1,0 +1,764 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Baba Mirantes</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Saira+Extra+Condensed:wght@700;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+
+:root{
+  --quadra:#1553A1; --quadra-faixa:#124A92; --painel:#0B1E3A;
+  --camisa:#F26A1F; --na-camisa:#0B1E3A; --cartao:#F4C20D;
+  --fundo:#EDF1F6; --papel:#FFFFFF; --tinta:#10233D; --tinta-2:#55667E;
+  --risca:#D3DBE6; --erro:#B42318; --destaque:#FFE9D9;
+  --display:"Saira Extra Condensed","Avenir Next Condensed","Roboto Condensed","sans-serif-condensed","Arial Narrow",Impact,sans-serif;
+  --texto:"Barlow",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --quadra:#134A91; --quadra-faixa:#10417F; --painel:#06152B;
+    --fundo:#081321; --papel:#0F2137; --tinta:#E8EEF6; --tinta-2:#9CADC4;
+    --risca:#1E3552; --erro:#FF8A7A; --destaque:#3A2414;
+  }
+}
+:root[data-theme="dark"]{
+  --quadra:#134A91; --quadra-faixa:#10417F; --painel:#06152B;
+  --fundo:#081321; --papel:#0F2137; --tinta:#E8EEF6; --tinta-2:#9CADC4;
+  --risca:#1E3552; --erro:#FF8A7A; --destaque:#3A2414;
+}
+
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0; background:var(--fundo); color:var(--tinta);
+  font:400 16px/1.45 var(--texto); -webkit-text-size-adjust:100%;
+}
+button,input{font:inherit; color:inherit}
+:focus-visible{outline:3px solid var(--camisa); outline-offset:2px}
+
+.pagina{max-width:560px; margin:0 auto; padding:0 0 40px}
+@media (min-width:600px){ .pagina{padding-top:24px} .quadra{border-radius:10px} }
+
+/* ---------- Cabeçalho: a quadra vista de cima ---------- */
+.quadra{
+  position:relative; overflow:hidden; color:#fff;
+  padding:28px 22px 22px;
+  background:repeating-linear-gradient(90deg,var(--quadra) 0 44px,var(--quadra-faixa) 44px 88px);
+}
+.quadra-lateral,.quadra-meio,.quadra-circulo{position:absolute; pointer-events:none; border:2px solid rgba(255,255,255,.5)}
+.quadra-lateral{inset:10px -20px 10px 10px}
+.quadra-meio{top:10px; bottom:10px; right:44px; border-width:0 0 0 2px}
+.quadra-circulo{width:150px; height:150px; border-radius:50%; right:-30px; top:50%; margin-top:-75px}
+
+.clube{position:relative; display:flex; align-items:center; gap:16px}
+.clube-texto{min-width:0}
+.escudo{width:clamp(54px,16vw,68px); height:auto; flex:none; filter:drop-shadow(0 3px 0 rgba(6,21,43,.35))}
+.escudo-bm{font:900 17px var(--display); fill:#fff; letter-spacing:.06em}
+.clube h1{
+  margin:0; font:900 clamp(44px,14vw,70px)/.86 var(--display);
+  text-transform:uppercase; letter-spacing:.015em;
+}
+.clube p{margin:8px 0 0; font-weight:500; font-size:15px; color:rgba(255,255,255,.92)}
+
+.placar{
+  position:relative; margin-top:22px; padding:12px 16px 14px;
+  background:var(--painel); border-radius:6px;
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.12);
+}
+.placar-linha{display:grid; grid-template-columns:1fr auto 1fr; align-items:end; gap:12px}
+.placar-lado{display:flex; flex-direction:column; align-items:center; gap:2px}
+.placar-rotulo{font-size:13px; font-weight:500; color:rgba(255,255,255,.75)}
+.placar-num{font:900 60px/.9 var(--display); font-variant-numeric:tabular-nums}
+.placar-x{font:700 30px/1 var(--display); color:var(--camisa); padding-bottom:10px}
+.placar-banco{margin:10px 0 0; text-align:center; font-size:14px; color:var(--cartao); font-weight:500}
+.placar-banco[hidden]{display:none}
+
+/* ---------- Corpo ---------- */
+main{padding:0 16px}
+.faixa-modo{margin:14px 0 0; padding:10px 14px; border:1.5px dashed var(--tinta-2); border-radius:6px; font-size:14px; color:var(--tinta-2)}
+.faixa-modo[hidden]{display:none}
+
+.entrada{margin-top:18px; padding:16px; background:var(--papel); border-radius:10px; border:1px solid var(--risca)}
+.entrada[hidden]{display:none}
+.entrada label{display:block; font-weight:600; margin-bottom:8px}
+.entrada-linha{display:flex; gap:10px}
+.campo-texto{
+  flex:1; min-width:0; height:50px; padding:0 14px; font-size:17px;
+  background:var(--fundo); border:1.5px solid var(--risca); border-radius:6px;
+}
+.campo-texto::placeholder{color:var(--tinta-2); opacity:.8}
+.botao{
+  height:50px; padding:0 18px; border:0; border-radius:6px; cursor:pointer;
+  background:var(--camisa); color:var(--na-camisa); font-weight:600; white-space:nowrap;
+}
+.botao:focus-visible{outline-color:var(--tinta)}
+.botao:disabled{opacity:.55; cursor:default}
+@media (max-width:480px){
+  .entrada > .entrada-linha{flex-direction:column}
+  .entrada > .entrada-linha .campo-texto{flex:none; width:100%}
+}
+
+.aviso{min-height:22px; margin:10px 2px 0; font-size:15px; font-weight:500}
+.aviso.erro{color:var(--erro)}
+.so-leitura{margin:18px 0 0; color:var(--tinta-2)}
+.so-leitura[hidden]{display:none}
+
+.secao{margin-top:26px}
+.secao[hidden]{display:none}
+.secao-topo{display:flex; align-items:baseline; justify-content:space-between; gap:12px; border-bottom:3px solid var(--tinta); padding-bottom:4px}
+.secao h2{margin:0; font:700 30px/1 var(--display); letter-spacing:.01em}
+.secao-conta{font-size:14px; color:var(--tinta-2); font-weight:500}
+.secao-dica{margin:8px 0 0; font-size:14px; color:var(--tinta-2)}
+
+.elenco{list-style:none; margin:0; padding:0}
+.jogador{
+  display:grid; grid-template-columns:44px 1fr auto; align-items:center; gap:12px;
+  padding:9px 2px; border-bottom:1px solid var(--risca);
+}
+.jogador.recem{animation:entrou 1.8s ease-out}
+@keyframes entrou{ from{background:var(--destaque)} to{background:transparent} }
+@media (prefers-reduced-motion: reduce){ .jogador.recem{animation:none} }
+
+.camisa{width:44px; height:40px; display:block}
+.camisa path{fill:var(--camisa)}
+.camisa text{font:900 19px var(--display); fill:var(--na-camisa)}
+.jogador.banco .camisa path{fill:none; stroke:var(--tinta-2); stroke-width:1.5; stroke-dasharray:3 2.5}
+.jogador.banco .camisa text{fill:var(--tinta-2)}
+
+.jogador-corpo{min-width:0; display:flex; flex-direction:column; gap:3px}
+.jogador-nome{font-weight:600; font-size:17px; overflow-wrap:anywhere}
+.tags{display:flex; flex-wrap:wrap; gap:4px 12px}
+.tag{display:inline-flex; align-items:center; gap:5px; font-size:13px; color:var(--tinta-2); font-weight:500}
+.tag svg{width:14px; height:14px; flex:none}
+.tag-bola svg circle{fill:var(--papel); stroke:var(--tinta); stroke-width:1.6}
+.tag-bola svg path{fill:var(--tinta)}
+.tag-cartao svg rect{fill:var(--cartao); stroke:var(--tinta); stroke-width:1}
+
+.botao-leve{
+  border:1.5px solid var(--risca); background:transparent; border-radius:6px;
+  padding:7px 11px; font-size:14px; font-weight:500; cursor:pointer; white-space:nowrap;
+}
+.botao-leve.confirma{border-color:var(--erro); color:var(--erro)}
+.botao-leve[aria-pressed="true"]{background:var(--cartao); border-color:var(--cartao); color:#10233D}
+
+.vazio{margin:14px 2px 0; color:var(--tinta-2)}
+
+.regras ol{margin:12px 0 0; padding-left:22px}
+.regras li{margin:4px 0}
+.regras p{margin:10px 0 0; color:var(--tinta-2); font-size:15px}
+
+/* ---------- Organização ---------- */
+.org{margin-top:30px; padding:16px; border:2px dashed var(--risca); border-radius:10px}
+.org[hidden]{display:none}
+.org h2{margin:0; font:700 30px/1 var(--display)}
+.org h3{margin:20px 0 6px; font-size:16px; font-weight:600}
+.org p{margin:0 0 10px; font-size:14px; color:var(--tinta-2)}
+.org .entrada-linha{margin-top:8px}
+.org .campo-texto,.org .botao{height:44px}
+.org-lista{list-style:none; margin:8px 0 0; padding:0}
+.org-lista li{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:7px 0; border-bottom:1px solid var(--risca)}
+.org-lista span{font-weight:500; overflow-wrap:anywhere; min-width:0}
+.abas{display:flex; gap:8px; margin-top:8px}
+.abas[hidden]{display:none}
+.abas .botao-leve[aria-pressed="true"]{background:var(--tinta); border-color:var(--tinta); color:var(--fundo)}
+
+.rodape{margin:30px 16px 0; display:flex; justify-content:space-between; align-items:center; gap:12px; font-size:14px; color:var(--tinta-2)}
+.link{background:none; border:0; padding:4px 0; color:inherit; text-decoration:underline; cursor:pointer; font-size:14px}
+.link[hidden]{display:none}
+</style>
+</head>
+<body>
+<div class="pagina">
+
+  <header class="quadra">
+    <i class="quadra-lateral" aria-hidden="true"></i>
+    <i class="quadra-meio" aria-hidden="true"></i>
+    <i class="quadra-circulo" aria-hidden="true"></i>
+
+    <div class="clube">
+      <svg class="escudo" viewBox="0 0 64 72" aria-hidden="true">
+        <defs><clipPath id="esc"><path d="M32 3 59 11v24c0 16-12 26-27 33C17 61 5 51 5 35V11Z"/></clipPath></defs>
+        <g clip-path="url(#esc)">
+          <rect width="64" height="72" fill="#F26A1F"/>
+          <rect x="16" width="8" height="72" fill="#0B1E3A"/>
+          <rect x="40" width="8" height="72" fill="#0B1E3A"/>
+          <rect width="64" height="25" fill="#0B1E3A"/>
+        </g>
+        <path d="M32 3 59 11v24c0 16-12 26-27 33C17 61 5 51 5 35V11Z" fill="none" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>
+        <text class="escudo-bm" x="32" y="21" text-anchor="middle">BM</text>
+        <circle cx="32" cy="43" r="11" fill="#fff" stroke="#0B1E3A" stroke-width="2"/>
+        <path d="M32 37.5l5.2 3.8-2 6.1h-6.4l-2-6.1Z" fill="#0B1E3A"/>
+      </svg>
+      <div class="clube-texto">
+        <h1>Baba Mirantes</h1>
+        <p id="quando"></p>
+      </div>
+    </div>
+
+    <div class="placar" id="placar" role="group">
+      <div class="placar-linha" aria-hidden="true">
+        <div class="placar-lado"><span class="placar-rotulo">Confirmados</span><span class="placar-num" id="pConf">0</span></div>
+        <span class="placar-x">×</span>
+        <div class="placar-lado"><span class="placar-rotulo">Vagas livres</span><span class="placar-num" id="pVagas">20</span></div>
+      </div>
+      <p class="placar-banco" id="pBanco" hidden></p>
+    </div>
+  </header>
+
+  <main>
+    <p class="faixa-modo" id="faixaModo" hidden></p>
+
+    <div class="entrada" id="entrada">
+      <label for="campoNome">Vai pro baba? Bota teu nome.</label>
+      <div class="entrada-linha">
+        <input class="campo-texto" id="campoNome" type="text" maxlength="30" autocomplete="off" autocapitalize="words" enterkeyhint="done" placeholder="Nome ou apelido" list="sugestoes">
+        <button class="botao" id="botaoEntrar" type="button">Botar nome na lista</button>
+      </div>
+      <datalist id="sugestoes"></datalist>
+      <p class="aviso" id="aviso" role="status" aria-live="polite"></p>
+    </div>
+    <p class="so-leitura" id="soLeitura" hidden>Você está só olhando a lista. Para botar teu nome, peça ao dono da página acesso de colaborador.</p>
+
+    <section class="secao" aria-labelledby="tConf">
+      <div class="secao-topo">
+        <h2 id="tConf">Confirmados</h2>
+        <span class="secao-conta" id="contaConf"></span>
+      </div>
+      <ol class="elenco" id="listaConf"></ol>
+      <p class="vazio" id="vazio" hidden></p>
+    </section>
+
+    <section class="secao" id="secaoBanco" aria-labelledby="tBanco" hidden>
+      <div class="secao-topo">
+        <h2 id="tBanco">Banco de reservas</h2>
+        <span class="secao-conta" id="contaBanco"></span>
+      </div>
+      <p class="secao-dica">Entra na lista quando alguém confirmado tirar o nome.</p>
+      <ol class="elenco" id="listaBanco"></ol>
+    </section>
+
+    <section class="secao regras" aria-labelledby="tRegras">
+      <div class="secao-topo"><h2 id="tRegras">Como a lista é ordenada</h2></div>
+      <ol>
+        <li>Quem pagou a bola.</li>
+        <li>Quem não pagou a bola.</li>
+        <li>Quem botou o nome e faltou no baba passado.</li>
+      </ol>
+      <p>Dentro de cada grupo vale quem botou o nome primeiro. São <span id="regraVagas">20</span> vagas, o resto fica no banco de reservas. A falta pesa só no baba seguinte.</p>
+    </section>
+
+    <section class="org" id="org" aria-labelledby="tOrg" hidden>
+      <h2 id="tOrg">Organização</h2>
+
+      <h3>Bola paga</h3>
+      <p>Quem está aqui passa na frente de quem não pagou.</p>
+      <div class="entrada-linha">
+        <input class="campo-texto" id="campoBola" type="text" maxlength="30" autocomplete="off" placeholder="Nome de quem pagou" list="sugestoes" aria-label="Nome de quem pagou a bola">
+        <button class="botao" id="botaoBola" type="button">Adicionar</button>
+      </div>
+      <ul class="org-lista" id="listaBola"></ul>
+
+      <h3 id="tFaltas">Quem faltou</h3>
+      <p>Marque quem botou o nome e não apareceu. Essa pessoa vai pro fim da fila no baba seguinte.</p>
+      <div class="abas" id="abas" hidden></div>
+      <ul class="org-lista" id="listaFaltas"></ul>
+
+      <p class="aviso" id="avisoOrg" role="status" aria-live="polite"></p>
+    </section>
+
+    <div class="org" id="orgPin" hidden>
+      <h2>Organização</h2>
+      <div class="entrada-linha">
+        <input class="campo-texto" id="campoPin" type="password" autocomplete="off" placeholder="PIN da organização" aria-label="PIN da organização">
+        <button class="botao" id="botaoPin" type="button">Entrar</button>
+      </div>
+      <p class="aviso" id="avisoPin" role="status" aria-live="polite"></p>
+    </div>
+  </main>
+
+  <footer class="rodape">
+    <span>Baba Mirantes, toda terça.</span>
+    <button class="link" id="linkOrg" type="button" hidden>Sou da organização</button>
+  </footer>
+</div>
+
+<script>
+(() => {
+'use strict';
+
+/* =====================================================================
+   CONFIGURAÇÃO
+   Para rodar fora do Claude (Vercel etc.), preencha os dois campos do
+   Supabase abaixo depois de rodar o supabase.sql no projeto.
+   ===================================================================== */
+const CONFIG = {
+  SUPABASE_URL: 'https://nmoiqluewoobkgivffrv.supabase.co',
+  SUPABASE_KEY: 'sb_publishable_uWeWCTGgHR61ivk8PHx_mg_3N6llj71',   // chave pública (publishable), pode ficar no código
+  VAGAS: 20,
+  DIA_DO_BABA: 2,     // 0 = domingo, 1 = segunda, 2 = terça...
+};
+
+/* ---------- Datas ---------- */
+const pad = n => String(n).padStart(2, '0');
+const chaveData = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+function proximoBaba(base = new Date()) {
+  const d = new Date(base.getFullYear(), base.getMonth(), base.getDate());
+  d.setDate(d.getDate() + ((CONFIG.DIA_DO_BABA - d.getDay() + 7) % 7));
+  return d;
+}
+const dataBaba = proximoBaba();
+const dataAnterior = new Date(dataBaba); dataAnterior.setDate(dataBaba.getDate() - 7);
+const JOGO = chaveData(dataBaba);
+const ANTERIOR = chaveData(dataAnterior);
+const EH_HOJE = chaveData(new Date()) === JOGO;
+const dataLonga = d => d.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+const dataCurta = d => d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+
+/* ---------- Nomes ---------- */
+const limpar = s => String(s || '').replace(/\s+/g, ' ').trim().slice(0, 30);
+const chaveDe = s => limpar(s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+  .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);
+
+/* ---------- Estado ---------- */
+const S = {
+  pronto: false,
+  modo: 'carregando',
+  nomes: { [JOGO]: [], [ANTERIOR]: [] },    // { chave, nome, ts, por }
+  bola: [],                                   // { chave, nome }
+  faltas: { [JOGO]: [], [ANTERIOR]: [] },   // { chave, nome }
+  podeEscrever: true,
+  organizador: false,
+  meuId: null,
+  abaFaltas: EH_HOJE ? JOGO : ANTERIOR,
+  recem: null,
+  confirmando: null,
+};
+let loja = null;
+
+/* ---------- Regra de prioridade ----------
+   1º quem pagou a bola, 2º quem não pagou, 3º quem faltou no baba
+   passado. Em cada grupo, quem botou o nome primeiro. */
+function classificar() {
+  const bola = new Set(S.bola.map(b => b.chave));
+  const faltou = new Set(S.faltas[ANTERIOR].map(f => f.chave));
+  return S.nomes[JOGO]
+    .map(e => ({ ...e, bola: bola.has(e.chave), faltou: faltou.has(e.chave) }))
+    .sort((a, b) => (a.faltou - b.faltou) || (b.bola - a.bola) || (a.ts - b.ts) || a.chave.localeCompare(b.chave));
+}
+
+/* =====================================================================
+   ARMAZENAMENTO
+   Três formas, mesma interface:
+   - Supabase  (quando CONFIG está preenchido: link aberto pra todo mundo)
+   - Claude    (quando a página está publicada como artifact)
+   - Demo      (sem nenhum dos dois: nada fica salvo)
+   ===================================================================== */
+
+function lojaDemo() {
+  const tira = (lista, chave) => lista.filter(x => x.chave !== chave);
+  return {
+    modo: 'demo',
+    async iniciar() { S.organizador = true; S.pronto = true; },
+    async entrar(nome, chave) { S.nomes[JOGO] = [...S.nomes[JOGO], { chave, nome, ts: Date.now(), por: null }]; },
+    async sair(chave) { S.nomes[JOGO] = tira(S.nomes[JOGO], chave); },
+    async bola(chave, nome, pagou) { S.bola = tira(S.bola, chave); if (pagou) S.bola.push({ chave, nome }); },
+    async falta(jogo, chave, nome, faltou) { S.faltas[jogo] = tira(S.faltas[jogo], chave); if (faltou) S.faltas[jogo].push({ chave, nome }); },
+    meu: () => true,
+  };
+}
+
+function lojaClaude(db, user) {
+  const nomes = j => db.collection(`jogos/${j}/nomes`);
+  const faltas = j => db.collection(`faltas/${j}/nomes`);
+  const bola = db.collection('bola');
+  const ler = snap => snap.docs.map(d => {
+    const v = d.data() || {};
+    return { chave: d.id, nome: limpar(v.nome) || d.id, ts: Number(v.ts) || 0, por: v.por ?? null };
+  });
+  return {
+    modo: 'claude',
+    async iniciar() {
+      if (user) {
+        const [eu, podeDados] = await Promise.all([user.me(), user.can('data.write')]);
+        S.meuId = eu.id;
+        S.organizador = !!eu.canEdit;
+        S.podeEscrever = podeDados !== false;
+      }
+      const caiu = e => {
+        if (e && e.code === 'revoked') { S.podeEscrever = false; S.organizador = false; }
+        render();
+      };
+      const ouvir = (ref, aplicar) => ref.onSnapshot(snap => { aplicar(ler(snap)); render(); }, caiu);
+      ouvir(nomes(JOGO), v => { S.nomes[JOGO] = v; S.pronto = true; });
+      ouvir(nomes(ANTERIOR), v => { S.nomes[ANTERIOR] = v; });
+      ouvir(bola, v => { S.bola = v; });
+      ouvir(faltas(ANTERIOR), v => { S.faltas[ANTERIOR] = v; });
+      ouvir(faltas(JOGO), v => { S.faltas[JOGO] = v; });
+    },
+    entrar: (nome, chave) => nomes(JOGO).doc(chave).set({ nome, ts: Date.now(), por: S.meuId }),
+    sair: chave => nomes(JOGO).doc(chave).delete(),
+    bola: (chave, nome, pagou) => pagou ? bola.doc(chave).set({ nome }) : bola.doc(chave).delete(),
+    falta: (jogo, chave, nome, faltou) => faltou ? faltas(jogo).doc(chave).set({ nome }) : faltas(jogo).doc(chave).delete(),
+    meu: e => S.organizador || (e.por ?? null) === S.meuId,
+  };
+}
+
+function lojaSupabase() {
+  const base = CONFIG.SUPABASE_URL.replace(/\/+$/, '') + '/rest/v1/';
+  const cab = { apikey: CONFIG.SUPABASE_KEY, 'Content-Type': 'application/json' };
+  if (CONFIG.SUPABASE_KEY.startsWith('eyJ')) cab.Authorization = 'Bearer ' + CONFIG.SUPABASE_KEY;
+
+  const guarda = {
+    get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+  };
+  let token = guarda.get('baba-token');
+  if (!token) {
+    token = (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2) + Date.now());
+    guarda.set('baba-token', token);
+  }
+  let meus = new Set();
+  try { meus = new Set(JSON.parse(guarda.get('baba-meus') || '[]')); } catch {}
+  const salvarMeus = () => guarda.set('baba-meus', JSON.stringify([...meus].slice(-60)));
+  let pin = null;
+
+  async function api(caminho, opcoes = {}) {
+    const r = await fetch(base + caminho, { ...opcoes, headers: { ...cab, ...(opcoes.headers || {}) } });
+    const texto = await r.text();
+    let corpo = null;
+    try { corpo = texto ? JSON.parse(texto) : null; } catch {}
+    if (!r.ok) {
+      const e = new Error((corpo && corpo.message) || ('Erro ' + r.status));
+      e.code = corpo && corpo.code;
+      throw e;
+    }
+    return corpo;
+  }
+  const rpc = (nome, args) => api('rpc/' + nome, { method: 'POST', body: JSON.stringify(args) });
+
+  async function carregar() {
+    const jogos = `in.(${JOGO},${ANTERIOR})`;
+    const [n, b, f] = await Promise.all([
+      api(`baba_inscritos?select=jogo,chave,nome,criado_em&jogo=${jogos}`),
+      api('baba_bola?select=chave,nome'),
+      api(`baba_faltas?select=jogo,chave,nome&jogo=${jogos}`),
+    ]);
+    for (const j of [JOGO, ANTERIOR]) {
+      S.nomes[j] = n.filter(x => x.jogo === j).map(x => ({ chave: x.chave, nome: limpar(x.nome), ts: Date.parse(x.criado_em) || 0, por: null }));
+      S.faltas[j] = f.filter(x => x.jogo === j).map(x => ({ chave: x.chave, nome: limpar(x.nome) }));
+    }
+    S.bola = b.map(x => ({ chave: x.chave, nome: limpar(x.nome) }));
+    S.pronto = true;
+  }
+  const recarregar = () => carregar().then(render).catch(() => {});
+
+  return {
+    modo: 'supabase',
+    async iniciar() {
+      await carregar();
+      setInterval(() => { if (document.visibilityState === 'visible') recarregar(); }, 20000);
+      document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') recarregar(); });
+    },
+    async entrar(nome, chave) {
+      await api('baba_inscritos', {
+        method: 'POST', headers: { Prefer: 'return=minimal' },
+        body: JSON.stringify({ jogo: JOGO, chave, nome, dono: token }),
+      });
+      meus.add(JOGO + '|' + chave); salvarMeus();
+      await carregar();
+    },
+    async sair(chave) {
+      const ok = await rpc('baba_tirar_nome', { p_jogo: JOGO, p_chave: chave, p_dono: token, p_pin: pin });
+      await carregar();
+      if (ok === false) throw new Error('Só quem botou o nome ou a organização pode tirar.');
+      meus.delete(JOGO + '|' + chave); salvarMeus();
+    },
+    async bola(chave, nome, pagou) {
+      await rpc('baba_bola_set', { p_pin: pin, p_chave: chave, p_nome: nome, p_pagou: pagou });
+      await carregar();
+    },
+    async falta(jogo, chave, nome, faltou) {
+      await rpc('baba_falta_set', { p_pin: pin, p_jogo: jogo, p_chave: chave, p_nome: nome, p_faltou: faltou });
+      await carregar();
+    },
+    async autenticar(tentativa) {
+      const ok = await rpc('baba_pin_ok', { p_pin: tentativa });
+      if (ok === true) { pin = tentativa; S.organizador = true; }
+      return ok === true;
+    },
+    meu: e => S.organizador || meus.has(JOGO + '|' + e.chave),
+  };
+}
+
+function traduzErro(e) {
+  if (!e) return 'Não deu pra salvar. Tenta de novo.';
+  if (e.code === '23505') return 'Esse nome já está na lista.';
+  if (e.code === '42501') return 'A lista desse baba ainda não está aberta.';
+  if (e.code === 'quota_exceeded') return 'O espaço da lista encheu. Avise a organização.';
+  if (e.code === 'invalid_argument' || e.code === 'not_granted' || e.code === 'revoked')
+    return 'Você não tem permissão pra mudar a lista.';
+  if (e.message && /PIN|Só quem/.test(e.message)) return e.message;
+  return 'Não deu pra salvar. Tenta de novo.';
+}
+
+/* =====================================================================
+   TELA
+   ===================================================================== */
+const $ = id => document.getElementById(id);
+const el = (tag, cls, txt) => { const n = document.createElement(tag); if (cls) n.className = cls; if (txt != null) n.textContent = txt; return n; };
+
+const CAMISA = n => `<svg class="camisa" viewBox="0 0 44 40" aria-hidden="true"><path d="M14 3 4 9 1 19l8 3 2-4v19h22V18l2 4 8-3-3-10-10-6c-2 4-14 4-16 0Z"/><text x="22" y="29.5" text-anchor="middle">${n}</text></svg>`;
+const ICONE = {
+  bola: '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.6"/><path d="M8 4.6l3 2.2-1.1 3.5H6.1L5 6.8Z"/></svg>',
+  cartao: '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="4" y="1.5" width="8.5" height="13" rx="1.5" transform="rotate(8 8 8)"/></svg>',
+};
+function tag(tipo, texto) {
+  const t = el('span', 'tag tag-' + tipo);
+  t.innerHTML = ICONE[tipo];
+  t.append(texto);
+  return t;
+}
+
+function avisar(texto, erro = false, alvo = 'aviso') {
+  const a = $(alvo);
+  a.textContent = texto;
+  a.classList.toggle('erro', !!erro);
+}
+
+function linha(e, numero, banco) {
+  const li = el('li', 'jogador' + (banco ? ' banco' : '') + (S.recem === e.chave ? ' recem' : ''));
+  li.innerHTML = CAMISA(numero);
+  const corpo = el('div', 'jogador-corpo');
+  corpo.append(el('span', 'jogador-nome', e.nome));
+  if (e.bola || e.faltou) {
+    const tags = el('span', 'tags');
+    if (e.bola) tags.append(tag('bola', 'Bola paga'));
+    if (e.faltou) tags.append(tag('cartao', 'Faltou no último baba'));
+    corpo.append(tags);
+  }
+  li.append(corpo);
+  if (S.podeEscrever && loja && loja.meu(e)) {
+    const confirmando = S.confirmando === e.chave;
+    const b = el('button', 'botao-leve' + (confirmando ? ' confirma' : ''), confirmando ? 'Confirma?' : 'Tirar');
+    b.type = 'button';
+    b.setAttribute('aria-label', (confirmando ? 'Confirmar: tirar ' : 'Tirar ') + e.nome + ' da lista');
+    b.addEventListener('click', () => tirar(e));
+    li.append(b);
+  }
+  return li;
+}
+
+function render() {
+  const lista = classificar();
+  const dentro = lista.slice(0, CONFIG.VAGAS);
+  const banco = lista.slice(CONFIG.VAGAS);
+  const livres = CONFIG.VAGAS - dentro.length;
+
+  $('quando').textContent = EH_HOJE ? `O baba é hoje, ${dataLonga(dataBaba)}.` : `Próximo baba: ${dataLonga(dataBaba)}.`;
+  $('pConf').textContent = dentro.length;
+  $('pVagas').textContent = livres;
+  $('placar').setAttribute('aria-label',
+    `${dentro.length} confirmados, ${livres} vagas livres` + (banco.length ? `, ${banco.length} no banco de reservas` : ''));
+  $('pBanco').hidden = banco.length === 0;
+  $('pBanco').textContent = banco.length === 1 ? '1 nome no banco de reservas' : `${banco.length} nomes no banco de reservas`;
+  $('regraVagas').textContent = CONFIG.VAGAS;
+
+  const faixa = $('faixaModo');
+  faixa.hidden = S.modo !== 'demo';
+  if (S.modo === 'demo') faixa.textContent = 'Modo de demonstração: os nomes somem quando a página recarrega.';
+
+  $('entrada').hidden = !S.podeEscrever;
+  $('soLeitura').hidden = S.podeEscrever;
+
+  $('contaConf').textContent = S.pronto ? `${dentro.length} de ${CONFIG.VAGAS}` : '';
+  $('listaConf').replaceChildren(...dentro.map((e, i) => linha(e, i + 1, false)));
+  const vazio = $('vazio');
+  vazio.hidden = dentro.length > 0;
+  vazio.textContent = !S.pronto ? 'Carregando a lista…'
+    : S.podeEscrever ? 'Ninguém botou o nome ainda. Abre a lista aí.' : 'Ninguém botou o nome ainda.';
+
+  $('secaoBanco').hidden = banco.length === 0;
+  $('contaBanco').textContent = banco.length === 1 ? '1 na fila' : `${banco.length} na fila`;
+  const olBanco = $('listaBanco');
+  olBanco.start = CONFIG.VAGAS + 1;
+  olBanco.replaceChildren(...banco.map((e, i) => linha(e, CONFIG.VAGAS + i + 1, true)));
+
+  // Sugestões de nome: quem pagou a bola e quem veio no baba passado
+  const vistos = new Set(S.nomes[JOGO].map(e => e.chave));
+  const sug = new Map();
+  for (const x of [...S.bola, ...S.nomes[ANTERIOR]]) if (!vistos.has(x.chave)) sug.set(x.chave, x.nome);
+  $('sugestoes').replaceChildren(...[...sug.values()].map(n => { const o = el('option'); o.value = n; return o; }));
+
+  renderOrg();
+}
+
+function renderOrg() {
+  const temPin = loja && typeof loja.autenticar === 'function';
+  $('org').hidden = !S.organizador;
+  $('linkOrg').hidden = !(temPin && !S.organizador && $('orgPin').hidden);
+  if (S.organizador) $('orgPin').hidden = true;
+  if (!S.organizador) return;
+
+  // Bola paga
+  const pagos = [...S.bola].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+  const ulBola = $('listaBola');
+  if (!pagos.length) ulBola.replaceChildren(el('li', null, 'Ninguém na lista da bola ainda.'));
+  else ulBola.replaceChildren(...pagos.map(p => {
+    const li = el('li'); li.append(el('span', null, p.nome));
+    const b = el('button', 'botao-leve', 'Remover'); b.type = 'button';
+    b.setAttribute('aria-label', 'Remover ' + p.nome + ' da bola paga');
+    b.addEventListener('click', () => acaoOrg(() => loja.bola(p.chave, p.nome, false)));
+    li.append(b); return li;
+  }));
+
+  // Faltas
+  const abas = $('abas');
+  abas.hidden = !EH_HOJE;
+  if (EH_HOJE) {
+    abas.replaceChildren(...[[JOGO, `Hoje (${dataCurta(dataBaba)})`], [ANTERIOR, `Terça passada (${dataCurta(dataAnterior)})`]].map(([j, rotulo]) => {
+      const b = el('button', 'botao-leve', rotulo); b.type = 'button';
+      b.setAttribute('aria-pressed', String(S.abaFaltas === j));
+      b.addEventListener('click', () => { S.abaFaltas = j; render(); });
+      return b;
+    }));
+  }
+  const j = S.abaFaltas;
+  $('tFaltas').textContent = j === JOGO ? `Quem faltou hoje (${dataCurta(dataBaba)})` : `Quem faltou no baba passado (${dataCurta(dataAnterior)})`;
+  const faltou = new Set(S.faltas[j].map(f => f.chave));
+  const presentes = [...S.nomes[j]].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+  const ulF = $('listaFaltas');
+  if (!presentes.length) ulF.replaceChildren(el('li', null, 'Ninguém botou o nome nesse baba.'));
+  else ulF.replaceChildren(...presentes.map(p => {
+    const marcado = faltou.has(p.chave);
+    const li = el('li'); li.append(el('span', null, p.nome));
+    const b = el('button', 'botao-leve', marcado ? 'Faltou' : 'Marcar falta'); b.type = 'button';
+    b.setAttribute('aria-pressed', String(marcado));
+    b.setAttribute('aria-label', (marcado ? 'Desmarcar falta de ' : 'Marcar falta de ') + p.nome);
+    b.addEventListener('click', () => acaoOrg(() => loja.falta(j, p.chave, p.nome, !marcado)));
+    li.append(b); return li;
+  }));
+}
+
+/* ---------- Ações ---------- */
+async function entrar() {
+  if (!loja || !S.pronto) return;
+  const campo = $('campoNome'), botao = $('botaoEntrar');
+  const nome = limpar(campo.value), chave = chaveDe(nome);
+  if (nome.length < 2 || !chave) return avisar('Escreve teu nome ou apelido pra entrar na lista.', true);
+  if (S.nomes[JOGO].some(e => e.chave === chave)) return avisar(`${nome} já está na lista.`, true);
+  botao.disabled = true;
+  try {
+    await loja.entrar(nome, chave);
+    campo.value = '';
+    S.recem = chave;
+    setTimeout(() => { if (S.recem === chave) S.recem = null; }, 2000);
+    render();
+    const pos = classificar().findIndex(e => e.chave === chave) + 1;
+    avisar(!pos ? `${nome} entrou na lista.`
+      : pos <= CONFIG.VAGAS ? `${nome} está na lista, vaga ${pos}.`
+      : `Lista cheia. ${nome} ficou no banco de reservas, ${pos - CONFIG.VAGAS}º da fila.`);
+  } catch (e) {
+    avisar(traduzErro(e), true);
+  } finally {
+    botao.disabled = false;
+  }
+}
+
+let relogioConfirma = null;
+async function tirar(e) {
+  if (S.confirmando !== e.chave) {
+    S.confirmando = e.chave;
+    clearTimeout(relogioConfirma);
+    relogioConfirma = setTimeout(() => { S.confirmando = null; render(); }, 4000);
+    return render();
+  }
+  clearTimeout(relogioConfirma);
+  S.confirmando = null;
+  try {
+    await loja.sair(e.chave);
+    avisar(`${e.nome} saiu da lista.`);
+  } catch (err) {
+    avisar(traduzErro(err), true);
+  }
+  render();
+}
+
+async function acaoOrg(fazer) {
+  try { await fazer(); avisar('', false, 'avisoOrg'); }
+  catch (e) { avisar(traduzErro(e), true, 'avisoOrg'); }
+  render();
+}
+
+async function adicionarBola() {
+  const campo = $('campoBola');
+  const nome = limpar(campo.value), chave = chaveDe(nome);
+  if (nome.length < 2 || !chave) return avisar('Escreve o nome de quem pagou.', true, 'avisoOrg');
+  if (S.bola.some(b => b.chave === chave)) return avisar(`${nome} já está na bola paga.`, true, 'avisoOrg');
+  await acaoOrg(() => loja.bola(chave, nome, true));
+  campo.value = '';
+}
+
+async function entrarPin() {
+  const campo = $('campoPin');
+  if (!campo.value) return;
+  try {
+    const ok = await loja.autenticar(campo.value);
+    if (!ok) return avisar('PIN incorreto.', true, 'avisoPin');
+    campo.value = '';
+    render();
+  } catch (e) {
+    avisar('Não deu pra conferir o PIN. Tenta de novo.', true, 'avisoPin');
+  }
+}
+
+const noEnter = (id, fn) => $(id).addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); fn(); } });
+$('botaoEntrar').addEventListener('click', entrar);        noEnter('campoNome', entrar);
+$('botaoBola').addEventListener('click', adicionarBola);   noEnter('campoBola', adicionarBola);
+$('botaoPin').addEventListener('click', entrarPin);        noEnter('campoPin', entrarPin);
+$('linkOrg').addEventListener('click', () => { $('orgPin').hidden = false; render(); $('campoPin').focus(); });
+
+// Se a fonte do título não carregar, a reserva pode ser mais larga: encolhe até caber.
+function ajustarTitulo() {
+  const h = document.querySelector('.clube h1');
+  h.style.fontSize = '';
+  let t = parseFloat(getComputedStyle(h).fontSize);
+  while (h.scrollWidth > h.clientWidth + 1 && t > 28) { t -= 2; h.style.fontSize = t + 'px'; }
+}
+ajustarTitulo();
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(ajustarTitulo);
+window.addEventListener('resize', ajustarTitulo);
+
+// Se a aba ficar aberta e virar a semana, recarrega pra abrir a lista nova.
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && chaveData(proximoBaba()) !== JOGO) location.reload();
+});
+
+/* ---------- Início ---------- */
+(async function iniciar() {
+  render();
+  try {
+    if (CONFIG.SUPABASE_URL && CONFIG.SUPABASE_KEY) {
+      loja = lojaSupabase();
+    } else {
+      let db = null, user = null;
+      if (window.claude && typeof window.claude.use === 'function') {
+        [db, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]);
+      }
+      loja = db ? lojaClaude(db, user) : lojaDemo();
+    }
+    S.modo = loja.modo;
+    await loja.iniciar();
+  } catch (e) {
+    S.pronto = true;
+    avisar('Não deu pra carregar a lista. Recarrega a página.', true);
+  }
+  render();
+})();
+
+})();
+</script>
+</body>
+</html>
